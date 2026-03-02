@@ -1,0 +1,8 @@
+[Unit]
+Description=Freeze investigator preventive snapshot
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/local_freeze_investigator_v2
+ExecStart=/opt/local_freeze_investigator_v2/.venv/bin/python run.py snapshot-once
+User=root

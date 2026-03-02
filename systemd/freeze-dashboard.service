@@ -1,0 +1,12 @@
+[Unit]
+Description=Freeze investigator dashboard
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/local_freeze_investigator_v2
+ExecStart=/opt/local_freeze_investigator_v2/.venv/bin/python run.py serve-dashboard --host 0.0.0.0 --port 8787
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target

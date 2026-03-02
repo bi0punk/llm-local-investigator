@@ -1,0 +1,66 @@
+[
+  {
+    "node_name": "collect",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.109728+00:00",
+    "finished_at": "2026-03-02T07:12:09.479263+00:00",
+    "duration_ms": 369,
+    "note": "collected 17 base artifacts and 0 snapshots"
+  },
+  {
+    "node_name": "rules",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.480429+00:00",
+    "finished_at": "2026-03-02T07:12:09.569645+00:00",
+    "duration_ms": 89,
+    "note": "detected 1 signal lines; strongest=power"
+  },
+  {
+    "node_name": "preliminary_llm",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.570303+00:00",
+    "finished_at": "2026-03-02T07:12:09.628231+00:00",
+    "duration_ms": 57,
+    "note": "preliminary llm status=request_error"
+  },
+  {
+    "node_name": "decide_extra",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.628908+00:00",
+    "finished_at": "2026-03-02T07:12:09.628932+00:00",
+    "duration_ms": 0,
+    "note": "run_extra=True; profiles=none"
+  },
+  {
+    "node_name": "extra_probes",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.629524+00:00",
+    "finished_at": "2026-03-02T07:12:09.629839+00:00",
+    "duration_ms": 0,
+    "note": "extra probes collected for profiles: none"
+  },
+  {
+    "node_name": "final_llm",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.630219+00:00",
+    "finished_at": "2026-03-02T07:12:09.686324+00:00",
+    "duration_ms": 56,
+    "note": "final llm status=request_error"
+  },
+  {
+    "node_name": "report",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.686975+00:00",
+    "finished_at": "2026-03-02T07:12:09.689919+00:00",
+    "duration_ms": 2,
+    "note": "report files and trace files written"
+  },
+  {
+    "node_name": "persist",
+    "status": "ok",
+    "started_at": "2026-03-02T07:12:09.690473+00:00",
+    "finished_at": "2026-03-02T07:12:09.695342+00:00",
+    "duration_ms": 4,
+    "note": "incident persisted to sqlite with id=1"
+  }
+]

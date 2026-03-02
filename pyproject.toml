@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local-freeze-investigator-v2"
+version = "0.2.0"
+description = "Local Linux freeze investigation workflow with LangGraph, llama.cpp, SQLite, and a dashboard"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "langgraph",
+  "requests",
+  "jinja2",
+  "python-dotenv",
+  "pydantic",
+  "flask",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
