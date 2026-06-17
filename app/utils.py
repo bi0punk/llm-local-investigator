@@ -39,12 +39,22 @@ def read_text_if_exists(path: os.PathLike[str] | str) -> str:
     return p.read_text(encoding="utf-8")
 
 
+TS_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
+
+
+def validate_ts(ts_str: str) -> None:
+    if not TS_PATTERN.match(ts_str):
+        raise ValueError(f"Invalid timestamp format: {ts_str!r}. Expected YYYY-MM-DD HH:MM:SS")
+
+
 def ts_folder_name(ts_str: str) -> str:
+    validate_ts(ts_str)
     dt = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S")
     return dt.strftime("incident_%Y%m%d_%H%M%S")
 
 
 def compute_window(incident_ts: str, before_min: int, after_min: int) -> tuple[str, str]:
+    validate_ts(incident_ts)
     dt = datetime.strptime(incident_ts, "%Y-%m-%d %H:%M:%S")
     since = (dt - timedelta(minutes=before_min)).strftime("%Y-%m-%d %H:%M:%S")
     until = (dt + timedelta(minutes=after_min)).strftime("%Y-%m-%d %H:%M:%S")

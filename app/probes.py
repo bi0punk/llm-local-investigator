@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta
+import shlex
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
 from .shell import has_cmd, maybe_run
-from .utils import ensure_dir, now_iso
+from .utils import ensure_dir, now_iso, validate_ts
 
 
 def base_artifacts(since: str, until: str, include_previous_boot: bool = True) -> Dict[str, str]:
+    validate_ts(since)
+    validate_ts(until)
+    sq = shlex.quote
     artifacts = {
-        "journal": maybe_run(f"journalctl --since '{since}' --until '{until}' --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
-        "kernel_journal": maybe_run(f"journalctl -k --since '{since}' --until '{until}' --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
-        "priority_errors": maybe_run(f"journalctl -p 0..4 --since '{since}' --until '{until}' --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
+        "journal": maybe_run(f"journalctl --since {sq(since)} --until {sq(until)} --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
+        "kernel_journal": maybe_run(f"journalctl -k --since {sq(since)} --until {sq(until)} --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
+        "priority_errors": maybe_run(f"journalctl -p 0..4 --since {sq(since)} --until {sq(until)} --no-pager -o short-iso", timeout=60, required_binary="journalctl"),
         "dmesg_tail": maybe_run("dmesg -T | tail -n 400", timeout=20, required_binary="dmesg"),
         "last_reboots": maybe_run("last -x -F | head -n 60", timeout=20, required_binary="last"),
         "who_boot": maybe_run("who -b", timeout=10, required_binary="who"),
@@ -131,7 +135,7 @@ def capture_snapshot_once(snapshot_dir: Path) -> Dict[str, Any]:
         "dmesg_tail": maybe_run("dmesg -T | tail -n 60", timeout=15, required_binary="dmesg"),
         "sensors": maybe_run("sensors", timeout=10, required_binary="sensors"),
     }
-    day_file = snapshot_dir / (datetime.utcnow().strftime("%Y%m%d") + ".jsonl")
+    day_file = snapshot_dir / (datetime.now(timezone.utc).strftime("%Y%m%d") + ".jsonl")
     with day_file.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(data, ensure_ascii=False) + "\n")
     data["source_file"] = str(day_file)
@@ -143,7 +147,10 @@ def load_snapshots_around(snapshot_dir: Path, incident_ts: str, minutes: int, ma
     if not snapshot_dir.exists():
         return {"rows": [], "summary": "snapshot_dir does not exist"}
 
-    incident = datetime.strptime(incident_ts, "%Y-%m-%d %H:%M:%S")
+    try:
+        incident = datetime.strptime(incident_ts, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return {"rows": [], "summary": f"Invalid incident timestamp: {incident_ts!r}"}
     start = incident - timedelta(minutes=minutes)
     end = incident + timedelta(minutes=minutes)
     rows: List[Dict[str, Any]] = []

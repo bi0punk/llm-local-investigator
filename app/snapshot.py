@@ -18,6 +18,9 @@ def snapshot_once(snapshot_dir: str | Path | None = None) -> dict:
 def snapshot_loop(interval_sec: int = 60, snapshot_dir: str | Path | None = None) -> None:
     snapshot_dir = Path(snapshot_dir or SETTINGS.snapshot_dir)
     while True:
-        data = snapshot_once(snapshot_dir=snapshot_dir)
-        print(f"[snapshot] captured_at={data.get('captured_at')} source_file={data.get('source_file')}")
+        try:
+            data = snapshot_once(snapshot_dir=snapshot_dir)
+            print(f"[snapshot] captured_at={data.get('captured_at')} source_file={data.get('source_file')}")
+        except Exception as exc:
+            print(f"[snapshot] ERROR: {exc}")
         time.sleep(interval_sec)
