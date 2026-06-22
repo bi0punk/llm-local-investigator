@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -26,8 +27,7 @@ def has_cmd(binary: str) -> bool:
 
 def run_cmd(command: str, timeout: int = 30) -> CmdResult:
     proc = subprocess.run(
-        command,
-        shell=True,
+        shlex.split(command),
         text=True,
         capture_output=True,
         timeout=timeout,
