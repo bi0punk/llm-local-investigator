@@ -88,14 +88,7 @@ def extra_artifacts(profiles: List[str]) -> Dict[str, str]:
 
     if "thermal" in profiles:
         artifacts["thermal_zone"] = maybe_run(
-            r"""python3 - <<'PY'
-import glob
-for f in glob.glob('/sys/class/thermal/thermal_zone*/temp'):
-    try:
-        print(f"{f}={open(f).read().strip()}")
-    except Exception as exc:
-        print(f"{f}=ERROR:{exc}")
-PY""",
+            "bash -c 'python3 -c \"import glob; [print(\\\"{}={}\\\".format(f, open(f).read().strip())) for f in glob.glob(\\\"/sys/class/thermal/thermal_zone*/temp\\\")]\"'",
             timeout=20,
         )
         artifacts["thermal_grep"] = maybe_run(
