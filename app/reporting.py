@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from jinja2 import Template
 
@@ -152,10 +152,10 @@ HTML_TEMPLATE = Template(
 )
 
 
-def render_markdown(state: Dict[str, Any]) -> str:
+def render_markdown(state: dict[str, Any]) -> str:
     analysis = state.get("final_analysis") or state.get("preliminary_analysis") or {}
     rule_summary = state.get("rule_summary", {})
-    lines: List[str] = []
+    lines: list[str] = []
     lines.append(f"# Reporte incidente {state['incident_ts']}")
     lines.append("")
     lines.append(f"**Ventana analizada:** {state['since']} -> {state['until']}")
@@ -246,7 +246,7 @@ def render_markdown(state: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_html(state: Dict[str, Any]) -> str:
+def render_html(state: dict[str, Any]) -> str:
     analysis = state.get("final_analysis") or state.get("preliminary_analysis") or {}
     rule_summary = state.get("rule_summary", {})
     return HTML_TEMPLATE.render(

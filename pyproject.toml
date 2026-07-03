@@ -7,7 +7,7 @@ name = "local-freeze-investigator-v2"
 version = "0.2.0"
 description = "Local Linux freeze investigation workflow with LangGraph, llama.cpp, SQLite, and a dashboard"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
   "langgraph",
   "requests",
@@ -17,6 +17,25 @@ dependencies = [
   "flask",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.6.0",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]

@@ -4,7 +4,6 @@ import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -40,7 +39,7 @@ def run_cmd(command: str, timeout: int = 30) -> CmdResult:
     )
 
 
-def maybe_run(command: str, timeout: int = 30, required_binary: Optional[str] = None) -> str:
+def maybe_run(command: str, timeout: int = 30, required_binary: str | None = None) -> str:
     if required_binary and not has_cmd(required_binary):
         return f"[SKIPPED] binary not found: {required_binary}\ncommand: {command}"
     try:

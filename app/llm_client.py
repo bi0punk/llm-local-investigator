@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 from pydantic import ValidationError
@@ -21,7 +21,7 @@ class LLMClient:
         self.api_key = SETTINGS.llm_api_key
         self.trace_chars = SETTINGS.llm_trace_chars
 
-    def healthcheck(self) -> Dict[str, Any]:
+    def healthcheck(self) -> dict[str, Any]:
         info = {"base_url": self.base_url, "model": self.model, "reachable": False, "models": []}
         try:
             resp = requests.get(f"{self.base_url}/v1/models", timeout=10)
@@ -35,7 +35,7 @@ class LLMClient:
             info["error"] = str(exc)
         return info
 
-    def analyze(self, incident_ts: str, evidence: Dict[str, Any], pass_name: str = "final") -> Dict[str, Any]:
+    def analyze(self, incident_ts: str, evidence: dict[str, Any], pass_name: str = "final") -> dict[str, Any]:
         prompt = self._build_prompt(incident_ts=incident_ts, evidence=evidence, pass_name=pass_name)
         request_payload = {
             "model": self.model,
@@ -113,7 +113,7 @@ class LLMClient:
                 },
             }
 
-    def _chat(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def _chat(self, payload: dict[str, Any]) -> dict[str, Any]:
         url = f"{self.base_url}/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
@@ -128,7 +128,7 @@ class LLMClient:
         message = choices[0].get("message", {})
         content = message.get("content", "")
         if isinstance(content, list):
-            text_parts: List[str] = []
+            text_parts: list[str] = []
             for item in content:
                 if isinstance(item, dict) and item.get("type") == "text":
                     text_parts.append(item.get("text", ""))
@@ -144,10 +144,10 @@ class LLMClient:
         self,
         pass_name: str,
         status: str,
-        request_payload: Dict[str, Any],
-        response: Dict[str, Any],
-        parsed_json: Dict[str, Any] | None,
-    ) -> Dict[str, Any]:
+        request_payload: dict[str, Any],
+        response: dict[str, Any],
+        parsed_json: dict[str, Any] | None,
+    ) -> dict[str, Any]:
         return {
             "pass_name": pass_name,
             "status": status,
@@ -162,7 +162,7 @@ class LLMClient:
             "status_code": response.get("status_code"),
         }
 
-    def _build_prompt(self, incident_ts: str, evidence: Dict[str, Any], pass_name: str) -> str:
+    def _build_prompt(self, incident_ts: str, evidence: dict[str, Any], pass_name: str) -> str:
         schema = {
             "summary": "string",
             "overall_confidence": 0.0,
@@ -200,7 +200,7 @@ class LLMClient:
             f"Evidence JSON:\n{json.dumps(evidence, ensure_ascii=False)}"
         )
 
-    def _fallback_analysis(self, reason: str) -> Dict[str, Any]:
+    def _fallback_analysis(self, reason: str) -> dict[str, Any]:
         return {
             "summary": "LLM analysis unavailable. Review rule-based findings and collected artifacts.",
             "overall_confidence": 0.15,

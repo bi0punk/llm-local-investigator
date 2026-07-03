@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import Any
 
 
 def ensure_dir(path: os.PathLike[str] | str) -> Path:
@@ -22,7 +23,7 @@ def write_text(path: os.PathLike[str] | str, content: str) -> None:
     Path(path).write_text(content, encoding="utf-8")
 
 
-def read_json_if_exists(path: os.PathLike[str] | str) -> Optional[Any]:
+def read_json_if_exists(path: os.PathLike[str] | str) -> Any | None:
     p = Path(path)
     if not p.exists():
         return None
@@ -70,10 +71,10 @@ def shorten(text: str, max_chars: int) -> str:
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
-def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
+def extract_json_object(text: str) -> dict[str, Any] | None:
     text = (text or "").strip()
     if not text:
         return None
@@ -89,8 +90,7 @@ def extract_json_object(text: str) -> Optional[Dict[str, Any]]:
 
 def _candidate_json_strings(text: str) -> Iterable[str]:
     code_blocks = re.findall(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.DOTALL)
-    for block in code_blocks:
-        yield block
+    yield from code_blocks
 
     stack = 0
     start = None

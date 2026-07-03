@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 try:
     from langgraph.graph import END, START, StateGraph
@@ -19,7 +19,7 @@ from .trace import run_traced_node
 from .utils import ensure_dir, shorten, write_json, write_text
 
 
-def _make_llm_evidence(state: IncidentState, include_extra: bool = False) -> Dict[str, Any]:
+def _make_llm_evidence(state: IncidentState, include_extra: bool = False) -> dict[str, Any]:
     artifacts = dict(state.get("artifacts", {}))
     if include_extra:
         artifacts.update(state.get("extra_artifacts", {}))
@@ -32,7 +32,7 @@ def _make_llm_evidence(state: IncidentState, include_extra: bool = False) -> Dic
     return payload
 
 
-def _persist_llm_trace_files(outdir: Path, llm_trace: Dict[str, Any]) -> Dict[str, Any]:
+def _persist_llm_trace_files(outdir: Path, llm_trace: dict[str, Any]) -> dict[str, Any]:
     llm_dir = ensure_dir(outdir / "llm")
     pass_name = llm_trace.get("pass_name", "unknown")
     request_path = llm_dir / f"{pass_name}.request.json"
@@ -252,6 +252,7 @@ def node_report(state: IncidentState) -> IncidentState:
 def node_persist(state: IncidentState) -> IncidentState:
     # Persist is handled manually so the final trace file also contains the persist step.
     from time import perf_counter
+
     from .utils import now_iso
 
     started_at = now_iso()

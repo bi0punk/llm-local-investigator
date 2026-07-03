@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .config import SETTINGS
 from .utils import ensure_dir, now_iso, read_json_if_exists, read_text_if_exists
@@ -84,7 +84,7 @@ class Storage:
                 """
             )
 
-    def upsert_incident_from_state(self, state: Dict[str, Any]) -> int:
+    def upsert_incident_from_state(self, state: dict[str, Any]) -> int:
         analysis = state.get("final_analysis") or state.get("preliminary_analysis") or {}
         rule_summary = state.get("rule_summary", {})
         outdir = str(state["outdir"])
@@ -185,7 +185,7 @@ class Storage:
 
         return int(incident_id)
 
-    def record_snapshot(self, snapshot: Dict[str, Any]) -> None:
+    def record_snapshot(self, snapshot: dict[str, Any]) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -200,7 +200,7 @@ class Storage:
                 ),
             )
 
-    def list_incidents(self, limit: int = 100) -> List[Dict[str, Any]]:
+    def list_incidents(self, limit: int = 100) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -214,7 +214,7 @@ class Storage:
             ).fetchall()
         return [dict(row) for row in rows]
 
-    def get_incident(self, incident_id: int) -> Optional[Dict[str, Any]]:
+    def get_incident(self, incident_id: int) -> dict[str, Any] | None:
         with self._connect() as conn:
             row = conn.execute("SELECT * FROM incidents WHERE id = ?", (incident_id,)).fetchone()
         if not row:
@@ -231,7 +231,7 @@ class Storage:
         data["llm_calls"] = self.list_llm_calls(incident_id)
         return data
 
-    def list_traces(self, incident_id: int) -> List[Dict[str, Any]]:
+    def list_traces(self, incident_id: int) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -244,7 +244,7 @@ class Storage:
             ).fetchall()
         return [dict(row) for row in rows]
 
-    def list_llm_calls(self, incident_id: int) -> List[Dict[str, Any]]:
+    def list_llm_calls(self, incident_id: int) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -270,7 +270,7 @@ class Storage:
             result.append(item)
         return result
 
-    def list_snapshots(self, limit: int = 100) -> List[Dict[str, Any]]:
+    def list_snapshots(self, limit: int = 100) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(
                 """

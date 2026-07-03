@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -16,16 +16,16 @@ class Hypothesis(BaseModel):
     category: Literal["memory", "kernel", "disk", "thermal", "gpu", "power", "network", "unknown"] = "unknown"
     confidence: float = Field(..., ge=0.0, le=1.0)
     likely_root_cause: str
-    evidence: List[str] = Field(default_factory=list)
-    next_checks: List[str] = Field(default_factory=list)
-    remediation: List[str] = Field(default_factory=list)
+    evidence: list[str] = Field(default_factory=list)
+    next_checks: list[str] = Field(default_factory=list)
+    remediation: list[str] = Field(default_factory=list)
 
 
 class AnalysisResult(BaseModel):
     summary: str
     overall_confidence: float = Field(..., ge=0.0, le=1.0)
-    analysis_notes: List[str] = Field(default_factory=list, description="Observable concise audit log, not hidden reasoning")
-    evidence_map: List[EvidenceMap] = Field(default_factory=list)
-    top_hypotheses: List[Hypothesis] = Field(default_factory=list)
-    missing_evidence: List[str] = Field(default_factory=list)
+    analysis_notes: list[str] = Field(default_factory=list, description="Observable concise audit log, not hidden reasoning")
+    evidence_map: list[EvidenceMap] = Field(default_factory=list)
+    top_hypotheses: list[Hypothesis] = Field(default_factory=list)
+    missing_evidence: list[str] = Field(default_factory=list)
     recommended_priority: Literal["low", "medium", "high", "critical"] = "medium"

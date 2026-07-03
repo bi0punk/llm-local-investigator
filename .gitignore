@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Runtime artifacts (se regeneran al ejecutar)
+db/*.sqlite3
+snapshots/*.jsonl
+outputs/incident_*/
+!db/.gitkeep
+!outputs/.gitkeep
+!snapshots/.gitkeep

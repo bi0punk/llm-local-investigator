@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
-PATTERNS: Dict[str, Tuple[str, int, str]] = {
+PATTERNS: dict[str, tuple[str, int, str]] = {
     "oom_killer": (r"(Out of memory|oom-killer|Killed process \d+)", 9, "memory"),
     "soft_or_hard_lockup": (
         r"(watchdog: BUG: soft lockup|watchdog: BUG: hard LOCKUP|soft lockup|hard LOCKUP|blocked for more than \d+ seconds)",
@@ -23,11 +23,11 @@ PATTERNS: Dict[str, Tuple[str, int, str]] = {
 }
 
 
-def evaluate_rules(artifacts: Dict[str, str], max_lines: int = 12) -> Dict[str, Any]:
+def evaluate_rules(artifacts: dict[str, str], max_lines: int = 12) -> dict[str, Any]:
     text = "\n\n".join(artifacts.values())
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    signals: Dict[str, List[str]] = {}
-    category_scores: Dict[str, int] = defaultdict(int)
+    signals: dict[str, list[str]] = {}
+    category_scores: dict[str, int] = defaultdict(int)
 
     for name, (pattern, weight, category) in PATTERNS.items():
         rx = re.compile(pattern, re.IGNORECASE)

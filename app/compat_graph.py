@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Tuple
+from typing import Any
 
 START = "__start__"
 END = "__end__"
@@ -9,11 +10,11 @@ END = "__end__"
 
 @dataclass
 class _CompiledGraph:
-    nodes: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
-    edges: Dict[str, str]
-    conditional_edges: Dict[str, Tuple[Callable[[Dict[str, Any]], str], Dict[str, str]]]
+    nodes: dict[str, Callable[[dict[str, Any]], dict[str, Any]]]
+    edges: dict[str, str]
+    conditional_edges: dict[str, tuple[Callable[[dict[str, Any]], str], dict[str, str]]]
 
-    def invoke(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def invoke(self, state: dict[str, Any]) -> dict[str, Any]:
         current = self.edges.get(START)
         if not current:
             raise RuntimeError("Graph has no START edge")
@@ -41,11 +42,11 @@ class _CompiledGraph:
 @dataclass
 class StateGraph:
     state_type: Any
-    nodes: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = field(default_factory=dict)
-    edges: Dict[str, str] = field(default_factory=dict)
-    conditional_edges: Dict[str, Tuple[Callable[[Dict[str, Any]], str], Dict[str, str]]] = field(default_factory=dict)
+    nodes: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = field(default_factory=dict)
+    edges: dict[str, str] = field(default_factory=dict)
+    conditional_edges: dict[str, tuple[Callable[[dict[str, Any]], str], dict[str, str]]] = field(default_factory=dict)
 
-    def add_node(self, name: str, fn: Callable[[Dict[str, Any]], Dict[str, Any]]) -> None:
+    def add_node(self, name: str, fn: Callable[[dict[str, Any]], dict[str, Any]]) -> None:
         self.nodes[name] = fn
 
     def add_edge(self, src: str, dst: str) -> None:
@@ -54,8 +55,8 @@ class StateGraph:
     def add_conditional_edges(
         self,
         src: str,
-        router: Callable[[Dict[str, Any]], str],
-        mapping: Dict[str, str],
+        router: Callable[[dict[str, Any]], str],
+        mapping: dict[str, str],
     ) -> None:
         self.conditional_edges[src] = (router, mapping)
 

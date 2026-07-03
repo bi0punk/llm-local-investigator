@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import json
 import shlex
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from .shell import has_cmd, maybe_run
 from .utils import ensure_dir, now_iso, validate_ts
 
 
-def base_artifacts(since: str, until: str, include_previous_boot: bool = True) -> Dict[str, str]:
+def base_artifacts(since: str, until: str, include_previous_boot: bool = True) -> dict[str, str]:
     validate_ts(since)
     validate_ts(until)
     sq = shlex.quote
@@ -37,7 +37,7 @@ def base_artifacts(since: str, until: str, include_previous_boot: bool = True) -
     return artifacts
 
 
-def decide_extra_profiles(signals: Dict[str, List[str]]) -> List[str]:
+def decide_extra_profiles(signals: dict[str, list[str]]) -> list[str]:
     profiles = set()
     if not signals:
         profiles.update({"disk", "memory", "thermal"})
@@ -54,8 +54,8 @@ def decide_extra_profiles(signals: Dict[str, List[str]]) -> List[str]:
     return sorted(profiles)
 
 
-def extra_artifacts(profiles: List[str]) -> Dict[str, str]:
-    artifacts: Dict[str, str] = {}
+def extra_artifacts(profiles: list[str]) -> dict[str, str]:
+    artifacts: dict[str, str] = {}
 
     if "disk" in profiles:
         artifacts["smartctl_scan"] = maybe_run("smartctl --scan-open", timeout=20, required_binary="smartctl")
@@ -116,7 +116,7 @@ def extra_artifacts(profiles: List[str]) -> Dict[str, str]:
     return artifacts
 
 
-def capture_snapshot_once(snapshot_dir: Path) -> Dict[str, Any]:
+def capture_snapshot_once(snapshot_dir: Path) -> dict[str, Any]:
     snapshot_dir = ensure_dir(snapshot_dir)
     data = {
         "captured_at": now_iso(),
@@ -128,14 +128,14 @@ def capture_snapshot_once(snapshot_dir: Path) -> Dict[str, Any]:
         "dmesg_tail": maybe_run("dmesg -T | tail -n 60", timeout=15, required_binary="dmesg"),
         "sensors": maybe_run("sensors", timeout=10, required_binary="sensors"),
     }
-    day_file = snapshot_dir / (datetime.now(timezone.utc).strftime("%Y%m%d") + ".jsonl")
+    day_file = snapshot_dir / (datetime.now(UTC).strftime("%Y%m%d") + ".jsonl")
     with day_file.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(data, ensure_ascii=False) + "\n")
     data["source_file"] = str(day_file)
     return data
 
 
-def load_snapshots_around(snapshot_dir: Path, incident_ts: str, minutes: int, max_rows: int) -> Dict[str, Any]:
+def load_snapshots_around(snapshot_dir: Path, incident_ts: str, minutes: int, max_rows: int) -> dict[str, Any]:
     snapshot_dir = Path(snapshot_dir)
     if not snapshot_dir.exists():
         return {"rows": [], "summary": "snapshot_dir does not exist"}
@@ -146,7 +146,7 @@ def load_snapshots_around(snapshot_dir: Path, incident_ts: str, minutes: int, ma
         return {"rows": [], "summary": f"Invalid incident timestamp: {incident_ts!r}"}
     start = incident - timedelta(minutes=minutes)
     end = incident + timedelta(minutes=minutes)
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
 
     for path in sorted(snapshot_dir.glob("*.jsonl")):
         try:
