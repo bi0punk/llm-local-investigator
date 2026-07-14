@@ -87,7 +87,7 @@ class Storage:
     def upsert_incident_from_state(self, state: dict[str, Any]) -> int:
         analysis = state.get("final_analysis") or state.get("preliminary_analysis") or {}
         rule_summary = state.get("rule_summary", {})
-        outdir = str(state["outdir"])
+        outdir = str(state.get("outdir", ""))
         report_md_path = str(Path(outdir) / "report.md")
         report_html_path = str(Path(outdir) / "report.html")
 

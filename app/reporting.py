@@ -156,9 +156,9 @@ def render_markdown(state: dict[str, Any]) -> str:
     analysis = state.get("final_analysis") or state.get("preliminary_analysis") or {}
     rule_summary = state.get("rule_summary", {})
     lines: list[str] = []
-    lines.append(f"# Reporte incidente {state['incident_ts']}")
+    lines.append(f"# Reporte incidente {state.get('incident_ts', 'unknown')}")
     lines.append("")
-    lines.append(f"**Ventana analizada:** {state['since']} -> {state['until']}")
+    lines.append(f"**Ventana analizada:** {state.get('since', '?')} -> {state.get('until', '?')}")
     lines.append("")
     lines.append("## Resumen")
     lines.append(analysis.get("summary", "No summary available"))
