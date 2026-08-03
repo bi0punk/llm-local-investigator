@@ -1,0 +1,110 @@
+{
+  "incident_ts": "2026-02-28 07:00:00",
+  "since": "2026-02-28 06:30:00",
+  "until": "2026-02-28 07:20:00",
+  "outdir": "outputs/incident_20260228_070000",
+  "rule_summary": {
+    "signals": {
+      "reboot_power_loss": [
+        "2026-03-02T03:25:04-03:00 kali systemd[1]: sys-devices-pci0000:00-0000:00:08.1-0000:07:00.5-acp_pdm_mach.0-sound-card2-controlC2.device: Failed to enqueue SYSTEMD_WANTS job, ignoring: Transaction for sound.target/start is destructive (systemd-reboot.service has 'start' job queued, but 'stop' is included in transaction)."
+      ]
+    },
+    "category_scores": {
+      "power": 4
+    },
+    "ranked_categories": [
+      [
+        "power",
+        4
+      ]
+    ],
+    "has_high_signal": false,
+    "strongest_signal": "power",
+    "signal_count": 1
+  },
+  "decision": {
+    "run_extra_probes": true,
+    "profiles": [],
+    "reason": "rule engine did not find a strong signal; preliminary LLM confidence is low (0.15); LLM requested more evidence"
+  },
+  "preliminary_analysis": {
+    "summary": "LLM analysis unavailable. Review rule-based findings and collected artifacts.",
+    "overall_confidence": 0.15,
+    "analysis_notes": [
+      "LLM response was unavailable or invalid.",
+      "Fallback report generated from rules and collected artifacts."
+    ],
+    "evidence_map": [
+      {
+        "signal": "llm_unavailable",
+        "effect": "context",
+        "detail": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+      }
+    ],
+    "top_hypotheses": [
+      {
+        "title": "LLM unavailable",
+        "category": "unknown",
+        "confidence": 0.15,
+        "likely_root_cause": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions",
+        "evidence": [
+          "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+        ],
+        "next_checks": [
+          "Verify llama-server is running",
+          "Check /v1/models and /v1/chat/completions reachability",
+          "Retry with a smaller or instruction-tuned model"
+        ],
+        "remediation": [
+          "Use --skip-llm for rule-only reports if the model server is down"
+        ]
+      }
+    ],
+    "missing_evidence": [
+      "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+    ],
+    "recommended_priority": "medium"
+  },
+  "final_analysis": {
+    "summary": "LLM analysis unavailable. Review rule-based findings and collected artifacts.",
+    "overall_confidence": 0.15,
+    "analysis_notes": [
+      "LLM response was unavailable or invalid.",
+      "Fallback report generated from rules and collected artifacts."
+    ],
+    "evidence_map": [
+      {
+        "signal": "llm_unavailable",
+        "effect": "context",
+        "detail": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+      }
+    ],
+    "top_hypotheses": [
+      {
+        "title": "LLM unavailable",
+        "category": "unknown",
+        "confidence": 0.15,
+        "likely_root_cause": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions",
+        "evidence": [
+          "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+        ],
+        "next_checks": [
+          "Verify llama-server is running",
+          "Check /v1/models and /v1/chat/completions reachability",
+          "Retry with a smaller or instruction-tuned model"
+        ],
+        "remediation": [
+          "Use --skip-llm for rule-only reports if the model server is down"
+        ]
+      }
+    ],
+    "missing_evidence": [
+      "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+    ],
+    "recommended_priority": "medium"
+  },
+  "metadata": {
+    "requested_by_cli": true,
+    "version": "0.2.0"
+  }
+}

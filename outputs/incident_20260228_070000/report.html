@@ -1,0 +1,192 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Freeze Investigator Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; color: #e5e7eb; background: #0f172a; }
+    h1, h2, h3 { color: #f8fafc; }
+    .muted { color: #94a3b8; }
+    .card { border: 1px solid #334155; border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1rem; background: #111827; }
+    .badge { display: inline-block; padding: .2rem .55rem; border-radius: 999px; background: #1e293b; border: 1px solid #334155; }
+    code, pre { background: #020617; color: #cbd5e1; }
+    pre { padding: .8rem; border-radius: 10px; overflow-x: auto; white-space: pre-wrap; }
+    ul { line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: .55rem; border-bottom: 1px solid #1f2937; vertical-align: top; }
+  </style>
+</head>
+<body>
+  <h1>Reporte incidente 2026-02-28 07:00:00</h1>
+  <p class="muted">Ventana analizada: 2026-02-28 06:30:00 -> 2026-02-28 07:20:00</p>
+
+  <div class="card">
+    <h2>Resumen</h2>
+    <p>LLM analysis unavailable. Review rule-based findings and collected artifacts.</p>
+    <p><strong>Confianza global:</strong> 0.15 | <strong>Prioridad:</strong> medium</p>
+  </div>
+
+  <div class="card">
+    <h2>Ranking por reglas</h2>
+    <table>
+      <thead><tr><th>Categoría</th><th>Score</th></tr></thead>
+      <tbody>
+      
+        <tr><td>power</td><td>4</td></tr>
+      
+      
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Notas de análisis</h2>
+    <ul>
+    
+      <li>LLM response was unavailable or invalid.</li>
+    
+      <li>Fallback report generated from rules and collected artifacts.</li>
+    
+    
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Mapa de evidencia</h2>
+    <table>
+      <thead><tr><th>Señal</th><th>Efecto</th><th>Detalle</th></tr></thead>
+      <tbody>
+      
+        <tr><td>llm_unavailable</td><td>context</td><td>LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions</td></tr>
+      
+      
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Hipótesis</h2>
+    
+      <div style="margin-bottom: 1rem;">
+        <h3>1. LLM unavailable <span class="badge">unknown | 0.15</span></h3>
+        <p><strong>Causa probable:</strong> LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions</p>
+        <p><strong>Evidencia:</strong></p>
+        <ul><li>LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions</li></ul>
+        <p><strong>Siguientes checks:</strong></p>
+        <ul><li>Verify llama-server is running</li><li>Check /v1/models and /v1/chat/completions reachability</li><li>Retry with a smaller or instruction-tuned model</li></ul>
+        <p><strong>Remediación:</strong></p>
+        <ul><li>Use --skip-llm for rule-only reports if the model server is down</li></ul>
+      </div>
+    
+    
+  </div>
+
+  <div class="card">
+    <h2>Evidencia faltante</h2>
+    <ul><li>LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions</li></ul>
+    
+  </div>
+
+  <div class="card">
+    <h2>Señales detectadas</h2>
+    
+      <h3>reboot_power_loss</h3>
+      <ul><li><code>2026-03-02T03:25:04-03:00 kali systemd[1]: sys-devices-pci0000:00-0000:00:08.1-0000:07:00.5-acp_pdm_mach.0-sound-card2-controlC2.device: Failed to enqueue SYSTEMD_WANTS job, ignoring: Transaction for sound.target/start is destructive (systemd-reboot.service has 'start' job queued, but 'stop' is included in transaction).</code></li></ul>
+    
+    
+  </div>
+
+  <div class="card">
+    <h2>Trazas por nodo</h2>
+    <table>
+      <thead><tr><th>Nodo</th><th>Estado</th><th>Duración ms</th><th>Nota</th></tr></thead>
+      <tbody>
+      
+        <tr><td>collect</td><td>ok</td><td>369</td><td>collected 17 base artifacts and 0 snapshots</td></tr>
+      
+        <tr><td>rules</td><td>ok</td><td>89</td><td>detected 1 signal lines; strongest=power</td></tr>
+      
+        <tr><td>preliminary_llm</td><td>ok</td><td>57</td><td>preliminary llm status=request_error</td></tr>
+      
+        <tr><td>decide_extra</td><td>ok</td><td>0</td><td>run_extra=True; profiles=none</td></tr>
+      
+        <tr><td>extra_probes</td><td>ok</td><td>0</td><td>extra probes collected for profiles: none</td></tr>
+      
+        <tr><td>final_llm</td><td>ok</td><td>56</td><td>final llm status=request_error</td></tr>
+      
+      
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Trazas LLM</h2>
+    
+      <div style="margin-bottom: 1rem;">
+        <h3>preliminary <span class="badge">request_error</span></h3>
+        <p><strong>Usage:</strong> {}</p>
+        <details>
+          <summary>Request preview</summary>
+          <pre>{
+  "model": "llama31-8b",
+  "temperature": 0.0,
+  "max_tokens": 2200,
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a Linux SRE incident analyst. Return ONLY one valid JSON object. Do not include markdown or prose outside JSON."
+    },
+    {
+      "role": "user",
+      "content": "Incident timestamp: 2026-02-28 07:00:00\nPass: preliminary\nTask: Analyze a Linux freeze/hang using only the supplied evidence. Prioritize hard evidence over guesses. Use at most 3 hypotheses. If evidence is weak, lower confidence and ask for more evidence.\n\nImportant constraint: 'analysis_notes' must be a concise observable audit log, not hidden chain-of-thought. Keep them short and factual.\n\nOutput schema exactly as JSON:\n{\n  \"summary\": \"string\",\n  \"overall_confidence\": 0.0,\n  \"analysis_notes\": [\n    \"brief observable analyst log entries\"\n  ],\n  \"evidence_map\": [\n    {\n      \"signal\": \"string\",\n      \"effect\": \"supports|refutes|context|unknown\",\n      \"detail\": \"string\"\n    }\n  ],\n  \"top_hypotheses\": [\n    {\n      \"title\": \"string\",\n      \"category\": \"memory|kernel|disk|thermal|gpu|power|network|unknown\",\n      \"confidence\": 0.0,\n      \"likely_root_cause\": \"string\",\n      \"evidence\": [\n        \"string\"\n      ],\n      \"next_checks\": [\n        \"string\"\n      ],\n      \"remediation\": [\n        \"string\"\n      ]\n    }\n  ],\n  \"missing_evidence\": [\n    \"string\"\n  ],\n  \"recommended_priority\": \"low|medium|high|critical\"\n}\n\nEvidence JSON:\n{\"incident_ts\": \"2026-02-28 07:00:00\", \"rule_summary\": {\"signals\": {\"reboot_power_loss\": [\"2026-03-02T03:25:04-03:00 kali systemd[1]: sys-devices-pci0000:00-0000:00:08.1-0000:07:00.5-acp_pdm_mach.0-sound-card2-controlC2.device: Failed to enqueue SYSTEMD_WANTS job, ignoring: Transaction for sound.target/start is destructive (systemd-reboot.service has 'start' job queued, but 'stop' is included in transaction).\"]}, \"category_scores\": {\"power\": 4}, \"ranked_categories\": [[\"power\", 4]], \"has_high_signal\": false, \"strongest_signal\": \"power\", \"signal_count\": 1}, \"snapshots\": {\"rows\": [], \"summary\": \"Loaded 0 snapshots in ±90 minute window\"}, \"artifacts\": {\"journal\": \"2026-02-28T06:30:16-03:00 kali org.kde.kdeconnect.daemon.desktop[3751]: qt.bluetooth.bluez: No uuids found for \\\"4C:BC:E9:59:50:B9\\\"\\n2026-02-28T06:30:16-03:00 kali org.kde.kdeconnect.daemon.desktop[3751]: qt.bluetooth.bluez: 
+
+...[TRUNCATED]...
+
+resource:///org/gnome/shell/ui/main.js:1024:18\\n                                                    _queueRedisplay@resource:///org/gnome/shell/ui/dash.js:484:14\\n                                                    _notifyStateChanged@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:981:43\\n                                                    _setWindows@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1007:22\\n                                                    wrapFileManagerApp/fileManagerApp._updateWindows@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1306:14\\n                                                    wrapFileManagerApp/</id<@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1274:32\\n                                                    _initializeUI/<@resource:///org/gnome/shell/ui/main.js:298:14\\n                                                    \\n2026-03-02T03:25:06-03:00 kali gnome-shell[3489]: Object Gjs_top-panel-vpnip_kali_org_VPNIPAddressIndicator_VPNIPAddressIndicator (0x5595e50e91e0), has been already disposed — impossible to access it. This might be caused by the object having been destroyed from C code using something such as destroy(), dispose(), or remove() vfuncs.\\n                                                  == Stack trace for context 0x5595dd3f29e0 ==\\n                                                  #0   5595dd4be6d0 i   file:///usr/share/gnome-shell/extensions/top-panel-vpnip@kali.org/VPNIPAddressIndicator.js:50 (3a90c264e560 @ 166)\\n                                                  #1   5595dd4be638 i   self-hosted:1432 (278b4d438470 @ 30)\\n                                                  #2   7fffd04d1590 b   self-hosted:800 (278b4d4381a0 @ 15)\\n                                                  #3   5595dd4be598 i   resource:///org/gnome/shell/ui/main.js:298 (6589ac0c240 @ 119)\\n2026-03-02T03:25:09-03:00 kali systemd[3306]: mpris-proxy.service: Failed with result 'exit-code'.\\n2026-03-02T03:25:09-03:00 kali evolution-calendar-factory[3866]: Error setting property 'ConnectionStatus' on interface org.gnome.evolution.dataserver.Source: La conexión está cerrada (g-io-error-quark, 18)\\n2026-03-02T03:25:39-03:00 kali NetworkManager[1614]: <warn>  [1772432739.5731] dispatcher: (64) failed (after 0.001 sec): Refusing activation, D-Bus is shutting down.\"}}"
+    }
+  ]
+}</pre>
+        </details>
+        <details>
+          <summary>Response preview</summary>
+          <pre></pre>
+        </details>
+      </div>
+    
+      <div style="margin-bottom: 1rem;">
+        <h3>final <span class="badge">request_error</span></h3>
+        <p><strong>Usage:</strong> {}</p>
+        <details>
+          <summary>Request preview</summary>
+          <pre>{
+  "model": "llama31-8b",
+  "temperature": 0.0,
+  "max_tokens": 2200,
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a Linux SRE incident analyst. Return ONLY one valid JSON object. Do not include markdown or prose outside JSON."
+    },
+    {
+      "role": "user",
+      "content": "Incident timestamp: 2026-02-28 07:00:00\nPass: final\nTask: Analyze a Linux freeze/hang using only the supplied evidence. Prioritize hard evidence over guesses. Use at most 3 hypotheses. If evidence is weak, lower confidence and ask for more evidence.\n\nImportant constraint: 'analysis_notes' must be a concise observable audit log, not hidden chain-of-thought. Keep them short and factual.\n\nOutput schema exactly as JSON:\n{\n  \"summary\": \"string\",\n  \"overall_confidence\": 0.0,\n  \"analysis_notes\": [\n    \"brief observable analyst log entries\"\n  ],\n  \"evidence_map\": [\n    {\n      \"signal\": \"string\",\n      \"effect\": \"supports|refutes|context|unknown\",\n      \"detail\": \"string\"\n    }\n  ],\n  \"top_hypotheses\": [\n    {\n      \"title\": \"string\",\n      \"category\": \"memory|kernel|disk|thermal|gpu|power|network|unknown\",\n      \"confidence\": 0.0,\n      \"likely_root_cause\": \"string\",\n      \"evidence\": [\n        \"string\"\n      ],\n      \"next_checks\": [\n        \"string\"\n      ],\n      \"remediation\": [\n        \"string\"\n      ]\n    }\n  ],\n  \"missing_evidence\": [\n    \"string\"\n  ],\n  \"recommended_priority\": \"low|medium|high|critical\"\n}\n\nEvidence JSON:\n{\"incident_ts\": \"2026-02-28 07:00:00\", \"rule_summary\": {\"signals\": {\"reboot_power_loss\": [\"2026-03-02T03:25:04-03:00 kali systemd[1]: sys-devices-pci0000:00-0000:00:08.1-0000:07:00.5-acp_pdm_mach.0-sound-card2-controlC2.device: Failed to enqueue SYSTEMD_WANTS job, ignoring: Transaction for sound.target/start is destructive (systemd-reboot.service has 'start' job queued, but 'stop' is included in transaction).\"]}, \"category_scores\": {\"power\": 4}, \"ranked_categories\": [[\"power\", 4]], \"has_high_signal\": false, \"strongest_signal\": \"power\", \"signal_count\": 1}, \"snapshots\": {\"rows\": [], \"summary\": \"Loaded 0 snapshots in ±90 minute window\"}, \"artifacts\": {\"journal\": \"2026-02-28T06:30:16-03:00 kali org.kde.kdeconnect.daemon.desktop[3751]: qt.bluetooth.bluez: No uuids found for \\\"4C:BC:E9:59:50:B9\\\"\\n2026-02-28T06:30:16-03:00 kali org.kde.kdeconnect.daemon.desktop[3751]: qt.bluetooth.bluez: No uui
+
+...[TRUNCATED]...
+
+resource:///org/gnome/shell/ui/main.js:1024:18\\n                                                    _queueRedisplay@resource:///org/gnome/shell/ui/dash.js:484:14\\n                                                    _notifyStateChanged@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:981:43\\n                                                    _setWindows@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1007:22\\n                                                    wrapFileManagerApp/fileManagerApp._updateWindows@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1306:14\\n                                                    wrapFileManagerApp/</id<@file:///usr/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/locations.js:1274:32\\n                                                    _initializeUI/<@resource:///org/gnome/shell/ui/main.js:298:14\\n                                                    \\n2026-03-02T03:25:06-03:00 kali gnome-shell[3489]: Object Gjs_top-panel-vpnip_kali_org_VPNIPAddressIndicator_VPNIPAddressIndicator (0x5595e50e91e0), has been already disposed — impossible to access it. This might be caused by the object having been destroyed from C code using something such as destroy(), dispose(), or remove() vfuncs.\\n                                                  == Stack trace for context 0x5595dd3f29e0 ==\\n                                                  #0   5595dd4be6d0 i   file:///usr/share/gnome-shell/extensions/top-panel-vpnip@kali.org/VPNIPAddressIndicator.js:50 (3a90c264e560 @ 166)\\n                                                  #1   5595dd4be638 i   self-hosted:1432 (278b4d438470 @ 30)\\n                                                  #2   7fffd04d1590 b   self-hosted:800 (278b4d4381a0 @ 15)\\n                                                  #3   5595dd4be598 i   resource:///org/gnome/shell/ui/main.js:298 (6589ac0c240 @ 119)\\n2026-03-02T03:25:09-03:00 kali systemd[3306]: mpris-proxy.service: Failed with result 'exit-code'.\\n2026-03-02T03:25:09-03:00 kali evolution-calendar-factory[3866]: Error setting property 'ConnectionStatus' on interface org.gnome.evolution.dataserver.Source: La conexión está cerrada (g-io-error-quark, 18)\\n2026-03-02T03:25:39-03:00 kali NetworkManager[1614]: <warn>  [1772432739.5731] dispatcher: (64) failed (after 0.001 sec): Refusing activation, D-Bus is shutting down.\"}}"
+    }
+  ]
+}</pre>
+        </details>
+        <details>
+          <summary>Response preview</summary>
+          <pre></pre>
+        </details>
+      </div>
+    
+    
+  </div>
+</body>
+</html>

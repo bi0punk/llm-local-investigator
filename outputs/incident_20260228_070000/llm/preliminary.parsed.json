@@ -1,0 +1,38 @@
+{
+  "summary": "LLM analysis unavailable. Review rule-based findings and collected artifacts.",
+  "overall_confidence": 0.15,
+  "analysis_notes": [
+    "LLM response was unavailable or invalid.",
+    "Fallback report generated from rules and collected artifacts."
+  ],
+  "evidence_map": [
+    {
+      "signal": "llm_unavailable",
+      "effect": "context",
+      "detail": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+    }
+  ],
+  "top_hypotheses": [
+    {
+      "title": "LLM unavailable",
+      "category": "unknown",
+      "confidence": 0.15,
+      "likely_root_cause": "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions",
+      "evidence": [
+        "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+      ],
+      "next_checks": [
+        "Verify llama-server is running",
+        "Check /v1/models and /v1/chat/completions reachability",
+        "Retry with a smaller or instruction-tuned model"
+      ],
+      "remediation": [
+        "Use --skip-llm for rule-only reports if the model server is down"
+      ]
+    }
+  ],
+  "missing_evidence": [
+    "LLM call failed: 400 Client Error: Bad Request for url: http://127.0.0.1:8080/v1/chat/completions"
+  ],
+  "recommended_priority": "medium"
+}
