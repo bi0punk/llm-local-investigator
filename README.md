@@ -1,39 +1,70 @@
 # llm-local-investigator
 
+Workflow de investigación de congelamientos (freezes) de sistemas Linux locales usando LangGraph. Orquesta una investigación de varios pasos: ejecuta comandos de sonda sobre el sistema congelado, analiza la salida con un LLM local (llama.cpp) y presenta los hallazgos vía un dashboard Flask.
+
 [![CI](https://github.com/bi0punk/llm-local-investigator/actions/workflows/ci.yml/badge.svg)](https://github.com/bi0punk/llm-local-investigator/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Local Linux system freeze investigation workflow using LangGraph. Orchestrates a multi-step investigation: executes probe commands on a frozen Linux system, analyzes output with a local LLM (llama.cpp), and presents findings via a Flask dashboard.
-
-## Tabla de contenidos
+## Contenido
 
 - [Características](#características)
-- [Stack](#stack)
 - [Arquitectura](#arquitectura)
-- [Requisitos](#requisitos)
+- [Stack](#stack)
+- [Estructura del repositorio](#estructura-del-repositorio)
 - [Instalación](#instalación)
 - [Uso](#uso)
-- [Tests](#tests)
-- [CI](#ci)
 - [Configuración](#configuración)
+- [Tests / CI](#tests--ci)
 - [Datos](#datos)
-- [Limitaciones y roadmap](#limitaciones-y-roadmap)
+- [Roadmap](#roadmap)
 - [Licencia](#licencia)
 
 ## Características
 
 - Workflow LangGraph: captura de artefactos → análisis basado en reglas → análisis LLM (preliminar + final) → reporte.
-- Probes de sistema (dmesg/journalctl/sensors/top/ps/etc.) con detección de perfiles extra (disk, memory, net).
-- Análisis con reglas (oom-killer, lockups, etc.) + LLM local (llama.cpp, OpenAI-compatible).
+- Probes de sistema (`dmesg`, `journalctl`, `sensors`, `top`, `ps`, etc.) con detección de perfiles extra (disk, memory, net).
+- Análisis con reglas (oom-killer, lockups, etc.) + LLM local (llama.cpp, API OpenAI-compatible).
 - Persistencia en SQLite (incidentes, traces, LLM calls, snapshots).
 - Dashboard Flask para revisar incidentes históricos.
 - Snapshots preventivos cada minuto vía systemd timer.
 - Reportes HTML + Markdown por incidente.
 
+## Arquitectura
+
+```mermaid
+flowchart TD
+    START((Incidente / timestamp)) --> COLLECT[collect<br/>probes + snapshots]
+    COLLECT --> RULES[rules<br/>detección de señales]
+    RULES --> PRELLM[preliminary_llm<br/>análisis LLM inicial]
+    PRELLM --> DECIDE[decide_extra<br/>¿probes adicionales?]
+    DECIDE -->|no| FIN_NOREC[finalize_without_extra<br/>reusa análisis preliminar]
+    DECIDE -->|sí| EXTRA[extra_probes<br/>perfiles disk/memory/net]
+    EXTRA --> FINLLM[final_llm<br/>análisis LLM final]
+    FIN_NOREC --> REPORT[report<br/>report.md / report.html]
+    FINLLM --> REPORT
+    REPORT --> PERSIST[persist<br/>SQLite + traces]
+    PERSIST --> END((fin))
+
+    subgraph Runtime
+        DB[(SQLite<br/>db/freeze_investigator.sqlite3)]
+        OUT[outputs/incidente/reportes]
+        SNAP[snapshots/YYYYMMDD.jsonl]
+    end
+    PERSIST --> DB
+    REPORT --> OUT
+    COLLECT --> SNAP
+```
+
+- **app/graph_flow.py**: define el grafo LangGraph (nodos: `collect → rules → llm_preliminary → llm_final → persist → report`).
+- **app/compat_graph.py**: implementación mínima de StateGraph si langgraph no está disponible.
+- **app/cli.py**: CLI con subcomandos.
+- **app/storage.py**: capa SQLite.
+- **app/snapshot.py**: snapshots preventivos continuos.
+
 ## Stack
 
-- **Lenguaje**: Python 3.12+
+- **Lenguaje**: Python 3.12+.
 - **Workflow**: LangGraph (con fallback `compat_graph` si langgraph no está).
 - **Web**: Flask (dashboard).
 - **LLM**: llama.cpp (servidor OpenAI-compatible local).
@@ -41,51 +72,46 @@ Local Linux system freeze investigation workflow using LangGraph. Orchestrates a
 - **Validación**: Pydantic.
 - **Calidad**: ruff (lint), pytest.
 
-## Arquitectura
+## Estructura del repositorio
 
 ```
- incident timestamp
-        │
-        ▼
-┌────────────────┐    ┌─────────────────┐
-│  app.probes     │ ─► │  app.rules       │  (regex: oom, lockup, ...)
-│  (dmesg, journal,│    │  → signals +     │
-│   sensors, ps…)  │    │  rule_summary    │
-└────────────────┘    └────────┬─────────┘
-                               │
-        ┌──────────────────────┘
-        ▼
-┌────────────────┐    ┌─────────────────┐
-│ app.llm_client  │ ─► │  app.reporting   │
-│ (llama.cpp /v1/ │    │  → report.md/html│
-│  chat)          │    │  + persist trace │
-└────────────────┘    └────────┬─────────┘
-                               │
-                               ▼
-                     ┌─────────────────┐
-                     │  app.storage     │  SQLite
-                     │  (incidents,     │
-                     │   traces, llm)   │
-                     └────────┬─────────┘
-                              │
-                              ▼
-                     ┌─────────────────┐
-                     │  app.dashboard   │  Flask
-                     └─────────────────┘
+llm-local-investigator/
+├── app/
+│   ├── __init__.py
+│   ├── cli.py
+│   ├── compat_graph.py
+│   ├── config.py
+│   ├── dashboard.py
+│   ├── graph_flow.py
+│   ├── llm_client.py
+│   ├── models.py
+│   ├── probes.py
+│   ├── reporting.py
+│   ├── rules.py
+│   ├── shell.py
+│   ├── snapshot.py
+│   ├── state.py
+│   ├── storage.py
+│   ├── trace.py
+│   └── utils.py
+├── db/                          # SQLite runtime (gitignored)
+├── outputs/                     # Reportes por incidente (gitignored)
+├── snapshots/                   # Snapshots preventivos (gitignored)
+├── scripts/
+│   ├── install_ubuntu.sh
+│   ├── investigate_example.sh
+│   └── start_llama_server_example.sh
+├── systemd/
+│   ├── freeze-dashboard.service
+│   ├── freeze-snapshot.service
+│   └── freeze-snapshot.timer
+├── tests/test_smoke.py
+├── run.py
+├── Makefile
+├── requirements.txt
+├── pyproject.toml
+└── LICENSE
 ```
-
-- **app/graph_flow.py**: define el grafo LangGraph (nodos: probe → rule → llm_preliminary → llm_final → persist → report).
-- **app/compat_graph.py**: implementación mínima de StateGraph si langgraph no está disponible.
-- **app/cli.py**: CLI con subcomandos.
-- **app/storage.py**: capa SQLite.
-- **app/snapshot.py**: snapshots preventivos continuos.
-
-## Requisitos
-
-- Linux nativo (usa comandos del sistema: `dmesg`, `journalctl`, `sensors`, `ps`, `top`).
-- Python 3.12+.
-- llama.cpp server (opcional si `--skip-llm` o `FI_ALLOW_OFFLINE=1`).
-- Comandos opcionales: `sensors` (lm-sensors), `smartctl`, `ip`.
 
 ## Instalación
 
@@ -104,6 +130,8 @@ Servicios systemd (snapshots cada minuto + dashboard):
 sudo ./scripts/install_ubuntu.sh
 sudo systemctl enable --now freeze-snapshot.timer freeze-dashboard.service
 ```
+
+Requisitos: Linux nativo (usa `dmesg`, `journalctl`, `sensors`, `ps`, `top`), Python 3.12+, llama.cpp server (opcional si `--skip-llm` o `FI_ALLOW_OFFLINE=1`).
 
 ## Uso
 
@@ -131,7 +159,26 @@ python run.py reindex
 
 Atajos en el `Makefile`: `make investigate`, `make snapshot`, `make dashboard`, `make healthcheck`.
 
-## Tests
+## Configuración
+
+Variables de entorno (ver `app/config.py`, prefijo `FI_`):
+
+| Variable                  | Default                              | Descripción                                    |
+|---------------------------|--------------------------------------|------------------------------------------------|
+| `FI_LLM_BASE_URL`         | `http://127.0.0.1:8080`              | URL del servidor llama.cpp                     |
+| `FI_LLM_MODEL`            | `local-model`                        | Nombre del modelo                              |
+| `FI_LLM_API_KEY`          | `not-needed`                         | API key del servidor LLM                       |
+| `FI_LLM_TIMEOUT`          | `180`                                | Timeout de las llamadas LLM                    |
+| `FI_LLM_TEMPERATURE`      | `0.0`                                | Temperatura del LLM                            |
+| `FI_LLM_MAX_TOKENS`       | `2200`                               | Máximo de tokens por llamada                   |
+| `FI_ALLOW_OFFLINE`        | (vacío)                              | Si `1`, permite correr sin LLM (modo fallback) |
+| `FI_OUTPUT_DIR`           | `./outputs`                          | Directorio de reportes                         |
+| `FI_SNAPSHOT_DIR`         | `./snapshots`                        | Directorio de snapshots                        |
+| `FI_DATABASE_PATH`        | `./db/freeze_investigator.sqlite3`   | Ruta de la base SQLite                         |
+| `FI_DASHBOARD_HOST`       | `127.0.0.1`                          | Host del dashboard                             |
+| `FI_DASHBOARD_PORT`       | `8787`                               | Puerto del dashboard                           |
+
+## Tests / CI
 
 ```bash
 pytest -q
@@ -139,22 +186,10 @@ pytest -q
 
 Smoke tests (`tests/test_smoke.py`): imports de módulos de `app`, subcomandos del CLI, higiene del repo (sin DB/outputs/snapshots commiteados), deps listadas. No requieren llama.cpp real.
 
-## CI
+CI — GitHub Actions (`.github/workflows/ci.yml`) sobre Python 3.12, disparado en push/PR a `main`/`master`:
 
-GitHub Actions (`.github/workflows/ci.yml`) sobre Python 3.12:
-
-- **lint** — `ruff check .`
-- **test** — `pip install -e ".[dev]"` + `pytest -q`
-
-## Configuración
-
-Variables de entorno (ver `app/config.py`, prefijo `FI_`):
-
-- `FI_LLM_BASE_URL` — URL del servidor llama.cpp (default `http://127.0.0.1:8080`).
-- `FI_LLM_MODEL` — nombre del modelo (default `local-model`).
-- `FI_LLM_TIMEOUT`, `FI_LLM_TEMPERATURE`, `FI_LLM_MAX_TOKENS` — params LLM.
-- `FI_ALLOW_OFFLINE` — si `1`, permite correr sin LLM (modo fallback).
-- Rutas de `db/`, `outputs/`, `snapshots/` configurables.
+- **lint** — `ruff check .`.
+- **test** — `pytest -q`.
 
 ## Datos
 
@@ -164,11 +199,16 @@ Directorios runtime (todos gitignored, se regeneran):
 - `outputs/incident_<timestamp>/` — reportes (`.md`/`.html`), traces, LLM calls, artefactos por incidente.
 - `snapshots/YYYYMMDD.jsonl` — snapshots preventivos (uno por minuto).
 
-## Limitaciones y roadmap
+## Roadmap
 
-- **Limitación**: requiere comandos Linux y permisos (dmesg/journalctl pueden necesitar `sudo`/grupo `systemd-journal`).
-- **Limitación**: sin tests del workflow end-to-end (necesita LLM real + sistema con incidentes).
-- **Roadmap**: más probes (perf, eBPF), correlación multi-incidente, alertas proactivas.
+- [x] Workflow de investigación con reglas + LLM preliminar/final.
+- [x] Persistencia en SQLite y reportes HTML/Markdown.
+- [x] Snapshots preventivos con systemd timer.
+- [ ] Más probes (perf, eBPF).
+- [ ] Correlación multi-incidente.
+- [ ] Alertas proactivas.
+
+Limitaciones a considerar: requiere comandos Linux y permisos (`dmesg`/`journalctl` pueden necesitar `sudo` o el grupo `systemd-journal`); sin tests del workflow end-to-end (necesita LLM real + sistema con incidentes).
 
 ## Licencia
 
