@@ -9,11 +9,10 @@ from .config import SETTINGS
 from .probes import capture_snapshot_once
 from .storage import Storage
 
-
 _running = True
 
 
-def _handle_signal(signum, frame):
+def _handle_signal(signum, _frame):
     global _running
     print(f"[snapshot] señal {signum} recibida, cerrando...", file=sys.stderr)
     _running = False

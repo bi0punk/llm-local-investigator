@@ -19,7 +19,7 @@ from .trace import run_traced_node
 from .utils import ensure_dir, shorten, write_json, write_text
 
 
-def _make_llm_evidence(state: IncidentState, include_extra: bool = False) -> dict[str, Any]:
+def _make_llm_evidence(state: dict[str, Any], include_extra: bool = False) -> dict[str, Any]:
     artifacts = dict(state.get("artifacts", {}))
     if include_extra:
         artifacts.update(state.get("extra_artifacts", {}))
@@ -50,8 +50,8 @@ def _persist_llm_trace_files(outdir: Path, llm_trace: dict[str, Any]) -> dict[st
     return enriched
 
 
-def node_collect(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_collect(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         outdir = ensure_dir(current["outdir"])
         artifacts = base_artifacts(
             since=current["since"],
@@ -75,8 +75,8 @@ def node_collect(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "collect", worker)
 
 
-def node_rules(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_rules(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         summary = evaluate_rules(current.get("artifacts", {}), max_lines=SETTINGS.max_signal_lines)
         return {
             "signals": summary["signals"],
@@ -87,8 +87,8 @@ def node_rules(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "rules", worker)
 
 
-def node_preliminary_llm(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_preliminary_llm(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         calls = list(current.get("llm_calls", []))
         if current.get("skip_llm"):
             analysis = {
@@ -131,8 +131,8 @@ def node_preliminary_llm(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "preliminary_llm", worker)
 
 
-def node_decide_extra(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_decide_extra(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         rule_summary = current.get("rule_summary", {})
         prelim = current.get("preliminary_analysis", {})
         profiles = decide_extra_profiles(current.get("signals", {}))
@@ -172,8 +172,8 @@ def route_after_decision(state: IncidentState) -> str:
     return "finalize_without_extra"
 
 
-def node_extra_probes(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_extra_probes(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         outdir = ensure_dir(current["outdir"])
         profiles = current.get("decision", {}).get("profiles", [])
         artifacts = extra_artifacts(profiles)
@@ -186,8 +186,8 @@ def node_extra_probes(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "extra_probes", worker)
 
 
-def node_final_llm(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_final_llm(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         if current.get("skip_llm"):
             return {
                 "final_analysis": current.get("preliminary_analysis", {}),
@@ -207,8 +207,8 @@ def node_final_llm(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "final_llm", worker)
 
 
-def node_finalize_without_extra(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_finalize_without_extra(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         return {
             "final_analysis": current.get("preliminary_analysis", {}),
             "_trace_note": "reused preliminary analysis without extra probes",
@@ -217,8 +217,8 @@ def node_finalize_without_extra(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "finalize_without_extra", worker)
 
 
-def node_report(state: IncidentState) -> IncidentState:
-    def worker(current: IncidentState) -> IncidentState:
+def node_report(state: dict[str, Any]) -> dict[str, Any]:
+    def worker(current: dict[str, Any]) -> dict[str, Any]:
         outdir = ensure_dir(current["outdir"])
         md = render_markdown(current)
         html = render_html(current)
@@ -249,7 +249,7 @@ def node_report(state: IncidentState) -> IncidentState:
     return run_traced_node(state, "report", worker)
 
 
-def node_persist(state: IncidentState) -> IncidentState:
+def node_persist(state: dict[str, Any]) -> dict[str, Any]:
     # Persist is handled manually so the final trace file also contains the persist step.
     from time import perf_counter
 
@@ -257,6 +257,7 @@ def node_persist(state: IncidentState) -> IncidentState:
 
     started_at = now_iso()
     t0 = perf_counter()
+    partial: dict[str, Any] = {}
     try:
         storage = Storage()
         incident_id = storage.upsert_incident_from_state(state)
